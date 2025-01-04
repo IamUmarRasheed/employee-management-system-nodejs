@@ -1,35 +1,25 @@
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
-import { prisma } from "../prismaClient.js";
 
-export const verifyJWT = asyncHandler(async (req, _, next) => {
-    try {
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
-        if (!token) {
-            throw new ApiError(401, "Unauthorized request");
-        }
+// Authentication middleware to verify JWT token
+export const authenticateJWT = (req, res, next) => {
+  const token = req.cookies.accessToken || req.headers["authorization"]?.split(" ")[1];
+console.log("authenticate", token);
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
 
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log("decoded", decoded);
 
-        const user = await prisma.employee.findUnique({
-            where: { id: decodedToken?._id },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-            },
-        });
-
-        if (!user) {
-            throw new ApiError(401, "Invalid Access Token");
-        }
-
-        req.user = user;
-        next();
-    } catch (error) {
-        throw new ApiError(401, error?.message || "Invalid access token");
-    }
-});
+    req.user = {
+      id: decoded.id,
+      role: decoded.role || "EMPLOYEE", 
+    };
+console.log("requ", req.user);
+    next(); 
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
