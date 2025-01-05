@@ -6,7 +6,6 @@ import { authorizeRole } from "../middlewares/role.middleware.js";
 
 const router= Router()
 
-
 router.route('/employeesregister').post( authenticateJWT, authorizeRole(["ADMIN"]), registerEmployee)
 
 router.route('/employeeslogin').post(loginEmployee)

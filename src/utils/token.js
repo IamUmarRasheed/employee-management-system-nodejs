@@ -6,6 +6,6 @@ export const generateToken = (userId,role) => {
   }
 
   return jwt.sign({ id: userId ,role:role }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "2h",
+    expiresIn: "1h",
   });
 };
