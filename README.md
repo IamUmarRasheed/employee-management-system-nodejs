@@ -1,4 +1,4 @@
-Employee Management System
+# Employee Management System
 Overview
 The Employee Management System allows an admin user to register, manage, and authenticate employees. It features role-based access control with support for multiple roles, such as "Admin" and "Employee."
 
